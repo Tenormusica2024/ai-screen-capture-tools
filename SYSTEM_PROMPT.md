@@ -22,7 +22,12 @@ set PROJECT_ROOT=C:\Users\YourName\MyProject
 $env:PROJECT_ROOT="C:\Users\YourName\MyProject"
 ```
 
-環境変数が設定されていない場合、スクリプトの親ディレクトリの `snips` フォルダに保存されます。
+**保存先の優先順位:**
+1. `SCREENSHOT_SAVE_DIR` 環境変数が設定されている場合 → その値を使用
+2. `PROJECT_ROOT` 環境変数が設定されている場合 → `%PROJECT_ROOT%\Codex\snips`
+3. 両方未設定の場合 → `<SCRIPT_DIR>\..\snips`（スクリプトの親ディレクトリの `snips` フォルダ）
+
+**重要**: このドキュメントでは `PROJECT_ROOT` 環境変数を設定することを前提としています。未設定の場合、保存先が `<SCRIPT_DIR>\..\snips` になるため、AIエージェントが想定と異なるディレクトリにアクセスする可能性があります。
 
 ---
 
@@ -35,7 +40,7 @@ $env:PROJECT_ROOT="C:\Users\YourName\MyProject"
 #### デフォルト実行
 
 ```bash
-cd "%PROJECT_ROOT%\Codex\tools"
+cd %PROJECT_ROOT%\Codex\tools
 python screen_capture_full.py
 ```
 
@@ -78,8 +83,8 @@ python screen_capture_full.py sub1 tr  # サブモニター1右上
 #### 実行例
 
 ```bash
-cd "%PROJECT_ROOT%\Codex\tools"
-python image_quadrant_crop.py "%PROJECT_ROOT%\Codex\snips\screen_20251201_143025_main_tl.png" --cleanup
+cd %PROJECT_ROOT%\Codex\tools
+python image_quadrant_crop.py %PROJECT_ROOT%\Codex\snips\screen_20251201_143025_main_tl.png --cleanup
 ```
 
 **動作**:
@@ -96,7 +101,7 @@ python image_quadrant_crop.py "%PROJECT_ROOT%\Codex\snips\screen_20251201_143025
 #### 実行例
 
 ```bash
-cd "%PROJECT_ROOT%\Codex\tools"
+cd %PROJECT_ROOT%\Codex\tools
 
 # 60分以上古いファイルのみ削除（デフォルト・推奨）
 python cleanup_snips.py
@@ -127,20 +132,20 @@ python cleanup_snips.py --all --force
 
 ```bash
 # 1. 全モニターを4分割キャプチャ
-cd "%PROJECT_ROOT%\Codex\tools"
+cd %PROJECT_ROOT%\Codex\tools
 python screen_capture_full.py
 
 # 2. Read ツールで画像内容を確認
-Read(file_path="C:\\Users\\Tenormusica\\<PROJECT_NAME>\\Codex\\snips\\screen_*.png")
+Read(file_path="%PROJECT_ROOT%\\Codex\\snips\\screen_*.png")
 
 # 3. 必要なら特定領域を再キャプチャ
 python screen_capture_full.py main tl  # メインモニター左上
 
 # 4. さらにズームが必要な場合（1段階のみ）
-python image_quadrant_crop.py "C:\\...\\screen_20251201_143025_main_tl.png" --cleanup
+python image_quadrant_crop.py %PROJECT_ROOT%\Codex\snips\screen_20251201_143025_main_tl.png --cleanup
 
 # 5. Read ツールで分割画像を確認
-Read(file_path="C:\\Users\\Tenormusica\\<PROJECT_NAME>\\Codex\\snips\\screen_20251201_143025_main_tl_*.png")
+Read(file_path="%PROJECT_ROOT%\\Codex\\snips\\screen_20251201_143025_main_tl_*.png")
 
 # 6. 確認完了後にクリーンアップ（60分以上古いファイルのみ）
 python cleanup_snips.py

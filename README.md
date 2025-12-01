@@ -93,11 +93,11 @@ python image_quadrant_crop.py "path/to/screen_20251201_143025.png"
 ### cleanup_snips.py
 
 ```bash
-# すべてのPNG/JPGを削除
-python cleanup_snips.py --all
-
-# 60分以上古いファイルのみ削除（デフォルト）
+# 60分以上古いファイルのみ削除（デフォルト・推奨）
 python cleanup_snips.py
+
+# すべてのPNG/JPGを削除（⚠️ 注意: 必要なスクショも削除される）
+python cleanup_snips.py --all --force
 ```
 
 ## 環境変数

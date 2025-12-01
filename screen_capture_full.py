@@ -14,8 +14,30 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 env_save_dir = os.getenv("SCREENSHOT_SAVE_DIR")
 if env_save_dir:
     candidate = Path(env_save_dir).resolve()
+    
+    # 絶対パスであることを確認
+    if not candidate.is_absolute():
+        raise ValueError(f"Invalid SCREENSHOT_SAVE_DIR: must be absolute path: {candidate}")
+    
+    # 親ディレクトリの存在確認
     if not candidate.parent.exists():
         raise ValueError(f"Invalid SCREENSHOT_SAVE_DIR: parent directory does not exist: {candidate.parent}")
+    
+    # システムディレクトリへの書き込み禁止
+    if os.name == "nt":  # Windows
+        forbidden_paths = [
+            Path("C:/Windows"), 
+            Path("C:/Program Files"), 
+            Path("C:/Program Files (x86)")
+        ]
+        for forbidden in forbidden_paths:
+            try:
+                candidate.relative_to(forbidden)
+                raise ValueError(f"Invalid SCREENSHOT_SAVE_DIR: cannot use system directory: {candidate}")
+            except ValueError:
+                # relative_to が失敗 = forbidden の配下ではない（OK）
+                pass
+    
     SAVE_DIR = candidate
 else:
     project_root = os.getenv("PROJECT_ROOT")
