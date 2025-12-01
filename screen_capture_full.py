@@ -10,7 +10,16 @@ from PIL import ImageGrab
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_SAVE_DIR = SCRIPT_DIR.parent / "snips"
-SAVE_DIR = Path(os.getenv("SCREENSHOT_SAVE_DIR", str(DEFAULT_SAVE_DIR)))
+
+env_save_dir = os.getenv("SCREENSHOT_SAVE_DIR")
+if env_save_dir:
+    candidate = Path(env_save_dir).resolve()
+    if not candidate.parent.exists():
+        raise ValueError(f"Invalid SCREENSHOT_SAVE_DIR: parent directory does not exist: {candidate.parent}")
+    SAVE_DIR = candidate
+else:
+    SAVE_DIR = DEFAULT_SAVE_DIR
+
 SAVE_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -120,17 +129,17 @@ def capture_fullscreen_quadrants() -> list[Path]:
 
     paths: list[Path] = []
 
-    monitor_infos = get_monitor_infos()
-    if not monitor_infos:
-        width, height = img.size
-        monitor_infos = [("main", (0, 0, width, height))]
-
-    main_img = None
-
     try:
         all_img = ImageGrab.grab(all_screens=True)
     except TypeError:
         all_img = ImageGrab.grab()
+
+    monitor_infos = get_monitor_infos()
+    if not monitor_infos:
+        width, height = all_img.size
+        monitor_infos = [("main", (0, 0, width, height))]
+
+    main_img = None
 
     for label, (left, top, right, bottom) in monitor_infos:
         if label == "main":
@@ -175,9 +184,14 @@ def capture_fullscreen_quadrants() -> list[Path]:
 def capture_monitor_region(label: str, region: str) -> Path:
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
+    try:
+        temp_img = ImageGrab.grab(all_screens=True)
+    except TypeError:
+        temp_img = ImageGrab.grab()
+
     monitor_infos = get_monitor_infos()
     if not monitor_infos:
-        width, height = img.size
+        width, height = temp_img.size
         monitor_infos = [("main", (0, 0, width, height))]
 
     rect = None
