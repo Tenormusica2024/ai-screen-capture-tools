@@ -9,8 +9,8 @@ from PIL import ImageGrab
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_SAVE_DIR = SCRIPT_DIR.parent / "snips"
 
+# Priority: SCREENSHOT_SAVE_DIR > PROJECT_ROOT/Codex/snips > SCRIPT_DIR/../snips
 env_save_dir = os.getenv("SCREENSHOT_SAVE_DIR")
 if env_save_dir:
     candidate = Path(env_save_dir).resolve()
@@ -18,7 +18,11 @@ if env_save_dir:
         raise ValueError(f"Invalid SCREENSHOT_SAVE_DIR: parent directory does not exist: {candidate.parent}")
     SAVE_DIR = candidate
 else:
-    SAVE_DIR = DEFAULT_SAVE_DIR
+    project_root = os.getenv("PROJECT_ROOT")
+    if project_root:
+        SAVE_DIR = Path(project_root).resolve() / "Codex" / "snips"
+    else:
+        SAVE_DIR = SCRIPT_DIR.parent / "snips"
 
 SAVE_DIR.mkdir(parents=True, exist_ok=True)
 

@@ -1,10 +1,21 @@
 import sys
+import os
 import time
 from pathlib import Path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-SNIPS_DIR = SCRIPT_DIR.parent / "snips"
+
+# Priority: SCREENSHOT_SAVE_DIR > PROJECT_ROOT/Codex/snips > SCRIPT_DIR/../snips
+env_save_dir = os.getenv("SCREENSHOT_SAVE_DIR")
+if env_save_dir:
+    SNIPS_DIR = Path(env_save_dir).resolve()
+else:
+    project_root = os.getenv("PROJECT_ROOT")
+    if project_root:
+        SNIPS_DIR = Path(project_root).resolve() / "Codex" / "snips"
+    else:
+        SNIPS_DIR = SCRIPT_DIR.parent / "snips"
 
 
 def cleanup(all_files: bool = False, older_than_minutes: int = 60) -> int:
@@ -37,6 +48,13 @@ def cleanup(all_files: bool = False, older_than_minutes: int = 60) -> int:
 
 def main(argv: list[str]) -> int:
     all_files = "--all" in argv[1:]
+    force = "--force" in argv[1:]
+    
+    if all_files and not force:
+        print("ERROR: --all requires --force flag to prevent accidental deletion", file=sys.stderr)
+        print("Usage: cleanup_snips.py --all --force", file=sys.stderr)
+        return 1
+    
     if not SNIPS_DIR.is_dir():
         print(f"snips directory not found: {SNIPS_DIR}")
         return 0
