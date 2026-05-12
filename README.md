@@ -2,6 +2,8 @@
 
 AIエージェントのための画面キャプチャツール群。ターミナル上のAIエージェントが自律的に画面確認できるよう設計されたシンプルなPythonスクリプト集です。
 
+![AI Screen Capture Tools hero: screen evidence for terminal-based AI agents](assets/ai-screen-capture-tools-hero.png)
+
 ## 背景
 
 ターミナル上のAIエージェントに「今この画面を見てほしい」という場面は意外と多くあります。
